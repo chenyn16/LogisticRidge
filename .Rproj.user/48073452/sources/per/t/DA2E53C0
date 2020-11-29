@@ -1,0 +1,27 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1606520852541.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3977608930",
+    "id" : "DA2E53C0",
+    "lastKnownWriteTime" : 1606541557,
+    "last_content_update" : 1606541557254,
+    "path" : "~/R/LogisticRidge/vignettes/tutorial.Rmd",
+    "project_path" : "vignettes/tutorial.Rmd",
+    "properties" : {
+        "cursorPosition" : "12,16",
+        "last_setup_crc32" : "",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

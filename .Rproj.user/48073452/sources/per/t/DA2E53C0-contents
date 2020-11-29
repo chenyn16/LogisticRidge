@@ -1,0 +1,79 @@
+---
+title: "tutorial"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{tutorial}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+The logisticRidge package want to build a logistic regression model with ridge penalty. The origin package is glmnet which is a more comprehensive package and include many type of generalized linear model. Here, we will only compare the model result of its ridge part. Since we only perform a logistic regression, we will use 2 classes from the iris dataset. We will compare our purposed method to the glmnet function. Since glmnet uses cyclical coordinate descent, but we are using Newton-Raphson, so the result will differ.
+
+```{r setup}
+library(LogisticRidge)
+library(glmnet)
+data("iris")
+iris_data = iris[1:100,]
+y = ifelse(iris_data$Species =='versicolor', 1, 0)
+X = as.matrix( iris_data[, -ncol(iris_data)] )
+glm.object = glmnet(X, y , family='binomial', alpha=0 , lambda=0, intercept=FALSE, standardize=FALSE)
+glm.object$beta
+
+```
+
+As comparsion, our implementation has the following result:
+```{r}
+logreg.ridge.fit(y , X, lambda=0, tol=1e-7, epochs=16)$coefficients
+```
+
+Although, we have slightly different beta coefficients, but we see they are at the same magnititude for this logistic regression, which means lambda=0. Our model aslo include the predicted probability and the predicted class as follow. Since the error is zero, it means We have a perfect match in this case. The error here is defines as 1-accuracy.
+
+```{r}
+logreg_object =  logreg.ridge.fit(y , X, lambda=0, tol=1e-7, epochs=16)
+logreg_object
+```
+
+
+```{r}
+glm.yhat = predict(glm.object, X)
+y.hat = c(exp(glm.yhat) /(1+exp(glm.yhat))  )
+pred = as.numeric(y.hat > 0.5)
+all( pred == logreg.ridge.fit(y , X, lambda=0, tol=1e-7, epochs=16)$pred )
+```
+
+We see on this naive dataset, our model get the same predicted label as glmnet. We will try a different lambda. This predict function is also computed in our logreg.ridge.predict() function as follow. Our function not only include the yhat value, and the predicted class and error.
+
+```{r}
+logreg.ridge.predict(logreg_object, X , y  )
+```
+```{r}
+logreg.ridge.fit(y , X, lambda=10
+                 , tol=1e-3, epochs=10)$coefficients
+glmnet(X, y , family='binomial', alpha=0 , lambda=10, intercept=FALSE, standardize=FALSE)$beta
+```
+
+We see although we have different value of coefficients, our coefficients has the same rank of absolute size. Petal.Length is the largest coefficient, and then Sepal.Width, Peta.Width, and Sepal.Length is the smallest. Next, we see an example using cross-validation.
+
+```{r}
+set.seed(123)
+x=matrix(rnorm(100),20,5)
+y=sample(c(0,1),20,replace=TRUE)
+logreg.ridge.fit(y,x,lambda=0)
+glmnet(x, y , family='binomial', alpha=0 , lambda=0, intercept=FALSE, standardize=FALSE)$beta
+```
+
+In the above case, we see we finally have the exactly same coefficients. Next, we use the cross-validation function to test the error.
+
+```{r}
+lambdas = c(0.1,0.3,0.7,1.2,0)
+logreg.ridge.cv(y, x, lambdas= lambdas)
+```
+
+The above cv function will compute logistic regression for each given lambdas and decide the best of them using accuracy.
